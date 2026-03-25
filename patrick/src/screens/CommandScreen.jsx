@@ -4,10 +4,10 @@ import { DECISIONS, PEOPLE } from '../data.js'
 import { Card, SLabel, Sheet, Tag, Pulse, WorkBar } from '../components/UI.jsx'
 
 const stats = [
-  { label:'Active Agents', value:'2', color:T.green },
-  { label:'Awaiting You', value:'2', color:T.amber },
-  { label:'Disagreement Index', value:'64↑', color:T.red },
-  { label:'Mesh Captures', value:'14', color:T.teal },
+  { label:'Active Agents', value:'2', sub:'1 idle', color:T.green },
+  { label:'Awaiting You', value:'2', sub:'both urgent', color:T.amber },
+  { label:'Disagreement Index', value:'64↑', sub:'from 58 yesterday', color:T.red },
+  { label:'Mesh Captures', value:'14', sub:'today', color:T.teal },
 ]
 
 export default function CommandScreen({ onNavigate, isMobile }) {
@@ -28,8 +28,9 @@ export default function CommandScreen({ onNavigate, isMobile }) {
       <div style={{ display:'grid', gridTemplateColumns:isMobile?'1fr 1fr':'repeat(4, 1fr)', gap:12, marginBottom:32 }}>
         {stats.map(s => (
           <div key={s.label} style={{ background:T.surface, borderRadius:10, padding:16, borderTop:`3px solid ${s.color}`, border:`1px solid ${T.border}`, borderTopColor:s.color, borderTopWidth:3, borderTopStyle:'solid' }}>
-            <div style={{ fontSize:28, fontFamily:'Fraunces, serif', fontWeight:700, color:s.color }}>{s.value}</div>
-            <div style={{ fontSize:11, color:T.textSub, fontFamily:'JetBrains Mono, monospace', textTransform:'uppercase', marginTop:4 }}>{s.label}</div>
+            <div style={{ fontSize:9, fontFamily:"'JetBrains Mono',monospace", color:T.textDim, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:4 }}>{s.label}</div>
+            <div style={{ fontSize:22, fontFamily:'Fraunces, serif', fontWeight:700, color:s.color, lineHeight:1, marginBottom:2 }}>{s.value}</div>
+            <div style={{ fontSize:10, fontFamily:"'JetBrains Mono',monospace", color:T.textDim }}>{s.sub}</div>
           </div>
         ))}
       </div>

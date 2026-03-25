@@ -25,8 +25,12 @@ export function HDot({ health }) {
 
 export function Pulse({ status }) {
   const active = status === 'active'
+  const c = active ? T.teal : T.textDim
   return (
-    <span style={{ display:'inline-block', width:8, height:8, borderRadius:'50%', background:active?T.green:T.textDim, boxShadow:active?`0 0 8px ${T.green}`:'none', animation:active?'pulse 2s infinite':'none', flexShrink:0 }} />
+    <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontFamily:"'JetBrains Mono',monospace", color:c }}>
+      <span style={{ width:6, height:6, borderRadius:'50%', background:c, display:'inline-block', boxShadow:active?`0 0 6px ${c}`:undefined }} />
+      {active ? 'Active' : 'Idle'}
+    </span>
   )
 }
 
@@ -104,31 +108,30 @@ export function Sheet({ open, onClose, children, title }) {
 }
 
 export const NNL_CONFIG = {
-  now: { label:'NOW', color:T.red, bg:T.redDim },
-  next: { label:'NEXT', color:T.amber, bg:T.amberDim },
-  later: { label:'LATER', color:T.textSub, bg:'rgba(255,255,255,0.04)' },
+  now: { label:'Now', color:T.red, bg:T.redDim, desc:'Active — needs attention this sprint' },
+  next: { label:'Next', color:T.amber, bg:T.amberDim, desc:'Queued — starts when capacity opens' },
+  later: { label:'Later', color:T.textSub, bg:'rgba(255,255,255,0.06)', desc:'Backlog — not yet scheduled' },
 }
 
 export function NNLTag({ value, onChange }) {
   const [open, setOpen] = useState(false)
   const cfg = NNL_CONFIG[value] || NNL_CONFIG.later
   return (
-    <span style={{ position:'relative', display:'inline-block' }}>
-      <span onClick={() => setOpen(!open)} style={{ display:'inline-block', padding:'2px 8px', borderRadius:4, background:cfg.bg, color:cfg.color, fontSize:10, fontFamily:'JetBrains Mono, monospace', textTransform:'uppercase', fontWeight:600, cursor:'pointer', letterSpacing:'0.5px' }}>
+    <div style={{ position:'relative' }}>
+      <span onClick={(e) => { e.stopPropagation(); setOpen(!open) }} style={{ fontSize:10, fontFamily:"'JetBrains Mono',monospace", fontWeight:700, color:cfg.color, background:cfg.bg, padding:'3px 8px', borderRadius:3, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer', border:`1px solid ${cfg.color}40`, whiteSpace:'nowrap' }}>
         {cfg.label} ▾
       </span>
-      {open && (
-        <div style={{ position:'absolute', top:'100%', left:0, marginTop:4, background:T.surfaceHigh, border:`1px solid ${T.borderMid}`, borderRadius:6, zIndex:10, overflow:'hidden' }}>
-          {Object.entries(NNL_CONFIG).map(([k, v]) => (
-            <div key={k} onClick={() => { onChange?.(k); setOpen(false) }}
-              style={{ padding:'6px 16px', cursor:'pointer', color:v.color, fontSize:10, fontFamily:'JetBrains Mono, monospace', textTransform:'uppercase', fontWeight:600, background:k===value?v.bg:'transparent' }}
-              onMouseEnter={e => e.currentTarget.style.background = v.bg}
-              onMouseLeave={e => { if(k!==value) e.currentTarget.style.background = 'transparent' }}>
-              {v.label}
+      {open && <>
+        <div onClick={(e) => { e.stopPropagation(); setOpen(false) }} style={{ position:'fixed', inset:0, zIndex:98 }} />
+        <div style={{ position:'absolute', top:'100%', left:0, marginTop:4, background:T.surfaceHigh, border:`1px solid ${T.borderMid}`, borderRadius:8, padding:6, zIndex:99, minWidth:160, boxShadow:'0 8px 24px rgba(0,0,0,0.5)' }}>
+          {Object.entries(NNL_CONFIG).map(([key, c]) => (
+            <div key={key} onClick={(e) => { e.stopPropagation(); onChange?.(key); setOpen(false) }} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', borderRadius:5, cursor:'pointer', marginBottom:2 }}>
+              <span style={{ fontSize:10, fontFamily:"'JetBrains Mono',monospace", fontWeight:700, color:c.color, background:c.bg, padding:'2px 7px', borderRadius:3, textTransform:'uppercase' }}>{c.label}</span>
+              <span style={{ fontSize:11, color:T.textSub }}>{c.desc}</span>
             </div>
           ))}
         </div>
-      )}
-    </span>
+      </>}
+    </div>
   )
 }
