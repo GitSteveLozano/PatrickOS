@@ -3,13 +3,13 @@ import { T, API_URL } from '../theme.js'
 import { PATRICK_SYSTEM_PROMPT } from '../data.js'
 
 const suggestions = [
-  'What should I focus on today?',
-  'What\'s the risk on Hartwell?',
-  'Should Sarah call Rachel about Cascade?',
+  'What are my two most important actions today?',
+  'Is Hartwell at real risk of churning?',
+  'Should Sarah close the Cascade deal personally?',
 ]
 
 export default function PatrickChat({ onClose, isMobile }) {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([{ role:'assistant', content:'I have full context on Meridian Advisory. What do you need?' }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const endRef = useRef(null)

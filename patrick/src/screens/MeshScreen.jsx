@@ -4,14 +4,14 @@ import { MESH_ENTRIES, MESH_SYSTEM_PROMPT } from '../data.js'
 import { Card, SLabel, Sheet } from '../components/UI.jsx'
 
 const suggestions = [
-  'What do we know about Hartwell Industries?',
-  'What\'s the history with Priya\'s workload?',
-  'Tell me about our pricing model for legacy clients',
-  'What should I know about James Reilly\'s retention risk?',
+  'Why does Hartwell get special treatment?',
+  'What do I need to know before the Cascade call?',
+  'Who\'s the biggest retention risk?',
+  'Why is Tech Advisory a strategic priority?',
 ]
 
 export default function MeshScreen({ isMobile }) {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([{ role:'assistant', content:'I hold everything Meridian Advisory has captured — every decision, tradeoff, and institutional note. Ask me anything about why your company is the way it is.' }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [browse, setBrowse] = useState(false)
@@ -46,7 +46,7 @@ export default function MeshScreen({ isMobile }) {
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
         <div>
           <h2 style={{ fontSize:20, fontFamily:'Fraunces, serif', fontWeight:600, color:T.text, margin:0 }}>Mesh</h2>
-          <span style={{ fontSize:12, color:T.textSub }}>{MESH_ENTRIES.length} captures</span>
+          <span style={{ fontSize:12, fontFamily:"'JetBrains Mono',monospace", color:T.textSub }}>247 captures · ask anything</span>
         </div>
         <button onClick={() => setBrowse(true)} style={{ padding:'8px 16px', borderRadius:8, border:`1px solid ${T.borderMid}`, background:'transparent', color:T.textSub, fontSize:13, cursor:'pointer', fontFamily:'DM Sans, sans-serif' }}>Browse</button>
       </div>
