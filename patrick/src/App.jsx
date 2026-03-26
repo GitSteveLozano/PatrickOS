@@ -1,41 +1,50 @@
 import { useState } from 'react'
 import { T, useIsMobile } from './theme.js'
-import { OKRS } from './data.js'
+import { BRIEFING } from './data.js'
 import { HDot } from './components/UI.jsx'
-import CommandScreen from './screens/CommandScreen.jsx'
-import OrgScreen from './screens/OrgScreen.jsx'
-import GoalsScreen from './screens/GoalsScreen.jsx'
-import AgentsScreen from './screens/AgentsScreen.jsx'
-import MeshScreen from './screens/MeshScreen.jsx'
+import HomeScreen from './screens/HomeScreen.jsx'
+import SignalScreen from './screens/SignalScreen.jsx'
+import EntitiesScreen from './screens/EntitiesScreen.jsx'
+import ConnectorScreen from './screens/ConnectorScreen.jsx'
 import SettingsScreen from './screens/SettingsScreen.jsx'
+import OnboardingScreen from './screens/OnboardingScreen.jsx'
 import PatrickChat from './screens/PatrickChat.jsx'
 
 const NAV = [
-  { id:'command', icon:'⬡', label:'Command', sub:'2 decisions' },
-  { id:'org', icon:'◎', label:'Org', sub:'Mission · People · OKRs' },
-  { id:'goals', icon:'◈', label:'Goals', sub:'Projects · Tasks' },
-  { id:'agents', icon:'→', label:'Agents', sub:'2 active · hire more' },
-  { id:'mesh', icon:'⟆', label:'Mesh', sub:'247 captures' },
+  { id:'home', icon:'⬡', label:'Home', sub:'Daily briefing' },
+  { id:'signals', icon:'◈', label:'Signals', sub:'9 active' },
+  { id:'entities', icon:'◎', label:'Entities', sub:'People · Projects · Deals' },
+  { id:'connectors', icon:'⟆', label:'Connectors', sub:'3 healthy · 1 degraded' },
+  { id:'settings', icon:'⚙', label:'Settings', sub:'Workspace' },
 ]
-
-const statusColor = { risk:T.red, drifting:T.amber, track:T.green }
 
 export default function App() {
   const isMobile = useIsMobile()
-  const [screen, setScreen] = useState('command')
+  const [screen, setScreen] = useState('home')
   const [showChat, setShowChat] = useState(false)
-  const [showSettings, setShowSettings] = useState(false)
+  const [onboarded, setOnboarded] = useState(() => !!localStorage.getItem('patrick_onboarded'))
+
+  if (!onboarded) {
+    return (
+      <OnboardingScreen onComplete={() => {
+        localStorage.setItem('patrick_onboarded', 'true')
+        setOnboarded(true)
+      }} />
+    )
+  }
 
   const renderScreen = () => {
     switch (screen) {
-      case 'command': return <CommandScreen onNavigate={setScreen} isMobile={isMobile} />
-      case 'org': return <OrgScreen isMobile={isMobile} />
-      case 'goals': return <GoalsScreen isMobile={isMobile} />
-      case 'agents': return <AgentsScreen isMobile={isMobile} />
-      case 'mesh': return <MeshScreen isMobile={isMobile} />
-      default: return <CommandScreen onNavigate={setScreen} isMobile={isMobile} />
+      case 'home': return <HomeScreen onNavigate={setScreen} isMobile={isMobile} />
+      case 'signals': return <SignalScreen isMobile={isMobile} />
+      case 'entities': return <EntitiesScreen isMobile={isMobile} onNavigate={setScreen} />
+      case 'connectors': return <ConnectorScreen isMobile={isMobile} />
+      case 'settings': return <SettingsScreen isMobile={isMobile} />
+      default: return <HomeScreen onNavigate={setScreen} isMobile={isMobile} />
     }
   }
+
+  const mobileNav = NAV.slice(0, 4)
 
   return (
     <>
@@ -62,41 +71,23 @@ export default function App() {
           </div>
         </div>
 
-        {/* OKR Strip - Desktop */}
+        {/* DI Score - Desktop */}
         {!isMobile && (
-          <div style={{ flex:1, display:'flex', gap:16, overflow:'auto', padding:'0 16px', alignItems:'center' }}>
-            {OKRS.map(o => (
-              <div key={o.id} onClick={() => setScreen('org')} style={{ display:'flex', alignItems:'center', gap:6, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
-                <HDot health={o.status} />
-                <span style={{ fontSize:12, color:T.textSub, maxWidth:140, overflow:'hidden', textOverflow:'ellipsis' }}>{o.objective}</span>
-                <span style={{ fontSize:12, fontFamily:'Fraunces, serif', fontWeight:600, color:statusColor[o.status] }}>{o.pct}%</span>
-              </div>
-            ))}
+          <div style={{ flex:1, display:'flex', alignItems:'center', padding:'0 16px' }}>
+            <span style={{ fontSize:12, fontFamily:'JetBrains Mono, monospace', color:T.red, fontWeight:600 }}>DI {BRIEFING.diScore}↑</span>
           </div>
         )}
 
         <div style={{ display:'flex', alignItems:'center', gap:12, flexShrink:0, marginLeft:'auto' }}>
-          {!isMobile && <span style={{ fontSize:12, fontFamily:'JetBrains Mono, monospace', color:T.red, fontWeight:600 }}>DI 64↑</span>}
+          {isMobile && <span style={{ fontSize:12, fontFamily:'JetBrains Mono, monospace', color:T.red, fontWeight:600 }}>DI {BRIEFING.diScore}↑</span>}
           <button onClick={() => setShowChat(!showChat)} style={{ padding:'6px 14px', borderRadius:8, background:T.violetDim, border:`1px solid ${T.violet}33`, color:T.violet, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'DM Sans, sans-serif', whiteSpace:'nowrap' }}>
             💬 Ask Patrick
           </button>
-          <button onClick={() => setShowSettings(true)} style={{ background:'none', border:'none', fontSize:18, color:T.textSub, cursor:'pointer', padding:4 }}>⚙</button>
+          {isMobile && (
+            <button onClick={() => setScreen('settings')} style={{ background:'none', border:'none', fontSize:18, color:T.textSub, cursor:'pointer', padding:4 }}>⚙</button>
+          )}
         </div>
       </div>
-
-      {/* Mobile OKR Strip */}
-      {isMobile && (
-        <div style={{ position:'fixed', top:56, left:0, right:0, height:36, background:T.surface, borderBottom:`1px solid ${T.border}`, display:'flex', alignItems:'center', gap:12, padding:'0 16px', overflow:'auto', zIndex:99 }}>
-          {OKRS.map(o => (
-            <div key={o.id} onClick={() => setScreen('org')} style={{ display:'flex', alignItems:'center', gap:4, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
-              <HDot health={o.status} />
-              <span style={{ fontSize:11, fontFamily:'Fraunces, serif', fontWeight:600, color:statusColor[o.status] }}>{o.pct}%</span>
-              <span style={{ fontSize:10, color:T.textSub }}>{o.objective.split(' ').slice(0,3).join(' ')}</span>
-            </div>
-          ))}
-          <span style={{ fontSize:11, fontFamily:'JetBrains Mono, monospace', color:T.red, fontWeight:600, flexShrink:0 }}>DI 64↑</span>
-        </div>
-      )}
 
       {/* Desktop Sidebar */}
       {!isMobile && (
@@ -118,7 +109,7 @@ export default function App() {
 
       {/* Main Content */}
       <div style={{
-        marginTop: isMobile ? 92 : 56,
+        marginTop: 56,
         marginLeft: isMobile ? 0 : 200,
         marginRight: !isMobile && showChat ? 380 : 0,
         padding: isMobile ? '20px 16px 100px' : '24px 32px',
@@ -131,7 +122,7 @@ export default function App() {
       {/* Mobile Bottom Tab Bar */}
       {isMobile && (
         <div style={{ position:'fixed', bottom:0, left:0, right:0, height:64, background:T.surface, borderTop:`1px solid ${T.border}`, display:'flex', justifyContent:'space-around', alignItems:'center', zIndex:100 }}>
-          {NAV.map(n => (
+          {mobileNav.map(n => (
             <div key={n.id} onClick={() => setScreen(n.id)} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, cursor:'pointer', padding:'8px 0', position:'relative' }}>
               {screen===n.id && <div style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:24, height:2, borderRadius:1, background:T.violet }} />}
               <span style={{ fontSize:16, color:screen===n.id?T.violet:T.textSub }}>{n.icon}</span>
@@ -143,9 +134,6 @@ export default function App() {
 
       {/* Patrick Chat */}
       {showChat && <PatrickChat onClose={() => setShowChat(false)} isMobile={isMobile} />}
-
-      {/* Settings */}
-      {showSettings && <SettingsScreen onClose={() => setShowSettings(false)} />}
     </>
   )
 }
