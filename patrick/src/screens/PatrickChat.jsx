@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { T, API_URL } from '../theme.js'
-import { PATRICK_SYSTEM_PROMPT } from '../data.js'
+import { COMBINED_SYSTEM_PROMPT } from '../data.js'
 
 const suggestions = [
-  'What are my two most important actions today?',
-  'Is Hartwell at real risk of churning?',
-  'Should Sarah close the Cascade deal personally?',
+  'What should I focus on today?',
+  'Why is the Disagreement Index at 64?',
+  'What does Patrick know about Hartwell that I might be missing?',
+  'Should Sarah call Rachel about Cascade personally?',
 ]
 
 export default function PatrickChat({ onClose, isMobile }) {
@@ -27,7 +28,7 @@ export default function PatrickChat({ onClose, isMobile }) {
       const res = await fetch(API_URL, {
         method:'POST',
         headers:{ 'Content-Type':'application/json', 'x-api-key':localStorage.getItem('anthropic_key')||'', 'anthropic-version':'2023-06-01', 'anthropic-dangerous-direct-browser-access':'true' },
-        body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:PATRICK_SYSTEM_PROMPT, messages:newMsgs.map(m => ({ role:m.role, content:m.content })) })
+        body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:1000, system:COMBINED_SYSTEM_PROMPT, messages:newMsgs.map(m => ({ role:m.role, content:m.content })) })
       })
       const data = await res.json()
       const reply = data.content?.[0]?.text || 'Unable to get response.'
@@ -47,7 +48,7 @@ export default function PatrickChat({ onClose, isMobile }) {
       <div style={{ padding:'16px 20px', borderBottom:`1px solid ${T.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
         <div>
           <div style={{ fontSize:16, fontWeight:600, color:T.text }}>🦞 Patrick</div>
-          <div style={{ fontSize:11, color:T.textSub }}>Meridian Advisory · 2 agents active</div>
+          <div style={{ fontSize:11, color:T.textSub }}>Meridian Advisory · 247 context captures</div>
         </div>
         <button onClick={onClose} style={{ background:'none', border:'none', color:T.textSub, fontSize:20, cursor:'pointer', padding:'4px 8px' }}>&times;</button>
       </div>
